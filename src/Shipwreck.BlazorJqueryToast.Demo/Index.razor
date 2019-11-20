@@ -1,0 +1,193 @@
+@page "/"
+@inherits LayoutComponentBase
+<dl>
+    <dt>Text</dt>
+    <dd>
+        <input type="text" @bind="@Text" />
+    </dd>
+    <dt>Heading</dt>
+    <dd>
+        <input type="text" @bind="@Heading" />
+    </dd>
+    <dt>Transition</dt>
+    <dd>
+        <select @bind="@Transition">
+            @foreach (var v in Transitions)
+            {
+                <option value="@v">@v</option>
+            }
+        </select>
+    </dd>
+    <dt>AllowToastClose</dt>
+    <dd>
+        <select @bind="@AllowToastClose">
+            @foreach (var v in Booleans)
+            {
+                <option value="@v">@v</option>
+            }
+        </select>
+    </dd>
+    <dt>HideAfter</dt>
+    <dd>
+        <input type="number" @bind="@HideAfter" />
+    </dd>
+    <dt>StackLength</dt>
+    <dd>
+        <input type="number" @bind="@StackLength" />
+    </dd>
+    <dt>Position</dt>
+    <dd>
+        <select @bind="@Position">
+            @foreach (var v in Positions)
+            {
+                <option value="@v">@v</option>
+            }
+        </select>
+    </dd>
+    <dt>Icon</dt>
+    <dd>
+        <select @bind="@Icon">
+            @foreach (var v in Icons)
+            {
+                <option value="@v">@v</option>
+            }
+        </select>
+    </dd>
+    <dt>TextAlign</dt>
+    <dd>
+        <select @bind="@TextAlign">
+            @foreach (var v in TextAligns)
+            {
+                <option value="@v">@v</option>
+            }
+        </select>
+    </dd>
+    <dt>ShowLoader</dt>
+    <dd>
+        <select @bind="@ShowLoader">
+            @foreach (var v in Booleans)
+            {
+                <option value="@v">@v</option>
+            }
+        </select>
+    </dd>
+    <dt>LoaderBackground</dt>
+    <dd>
+        <input type="text" @bind="@LoaderBackground" />
+    </dd>
+</dl>
+<button type="button"
+        @onclick="@ShowToast">
+    Generate
+</button>
+@code
+{
+    public enum Bools
+    {
+        Null,
+        True,
+        False
+    }
+    public enum ToastPositions
+    {
+        Default,
+
+        TopLeft,
+        TopCenter,
+        TopRight,
+
+        BottomLeft,
+        BottomCenter,
+        BottomRight,
+
+        MidCenter,
+
+        Custom
+    }
+
+    [Inject]
+    public IJSRuntime JS { get; set; }
+
+    public string Text { get; set; } = "Text that is to be shown in the toast";
+    public string Heading { get; set; }
+    public ToastTransition Transition { get; set; }
+
+    public IEnumerable<ToastTransition> Transitions
+        => Enum.GetValues(typeof(ToastTransition)).Cast<ToastTransition>();
+
+    public Bools AllowToastClose { get; set; }
+
+    public IEnumerable<Bools> Booleans
+        => Enum.GetValues(typeof(Bools)).Cast<Bools>();
+
+    public int? HideAfter { get; set; }
+
+    public int StackLength { get; set; }
+
+    public ToastPositions Position { get; set; }
+    public IEnumerable<ToastPositions> Positions
+        => Enum.GetValues(typeof(ToastPositions)).Cast<ToastPositions>();
+
+
+    public ToastIcon Icon { get; set; }
+
+    public IEnumerable<ToastIcon> Icons
+        => Enum.GetValues(typeof(ToastIcon)).Cast<ToastIcon>();
+
+    public TextAlignment TextAlign { get; set; }
+
+    public IEnumerable<TextAlignment> TextAligns
+        => Enum.GetValues(typeof(TextAlignment)).Cast<TextAlignment>();
+
+    public Bools ShowLoader { get; set; }
+    public string LoaderBackground { get; set; }
+    static string TrimOrNull(string v) => string.IsNullOrWhiteSpace(v) ? null : v.Trim();
+    static bool? ToBoolean(Bools v) => v == Bools.True ? true : v == Bools.False ? false : (bool?)null;
+    static ToastPosition ToPosition(ToastPositions v)
+    {
+        switch (v)
+        {
+            case ToastPositions.TopLeft:
+                return ToastPosition.TopLeft;
+            case ToastPositions.TopCenter:
+                return ToastPosition.TopCenter;
+            case ToastPositions.TopRight:
+                return ToastPosition.TopRight;
+
+            case ToastPositions.BottomLeft:
+                return ToastPosition.BottomLeft;
+            case ToastPositions.BottomCenter:
+                return ToastPosition.BottomCenter;
+            case ToastPositions.BottomRight:
+                return ToastPosition.BottomRight;
+
+            case ToastPositions.MidCenter:
+                return ToastPosition.MidCenter;
+
+            case ToastPositions.Custom:
+                return new ToastPosition("30vw", "35vh", "40vw", "45vh");
+        }
+        return default;
+    }
+    void ShowToast()
+    {
+        var p = new ToastOptions
+        {
+            Text = TrimOrNull(Text),
+            Heading = TrimOrNull(Heading),
+            Transition = Transition,
+            AllowToastClose = ToBoolean(AllowToastClose),
+            HideAfter = HideAfter != null ? TimeSpan.FromMilliseconds(HideAfter.Value) : TimeSpan.Zero,
+            StackLength = StackLength,
+            Position = ToPosition(Position),
+            Icon = Icon,
+            TextAlign = TextAlign,
+            ShowLoader = ToBoolean(ShowLoader),
+            LoaderBackground = TrimOrNull(LoaderBackground),
+        };
+
+        Console.WriteLine(p);
+
+        JS.ShowToastAsync(p);
+    }
+}
