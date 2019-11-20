@@ -11,6 +11,7 @@
     <Authors>shipwreck.jp</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>Blazor wrapper for Jquery Toast Plugin</Description>
+    <PackageProjectUrl>https://github.com/pgrho/blazor-toast</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
