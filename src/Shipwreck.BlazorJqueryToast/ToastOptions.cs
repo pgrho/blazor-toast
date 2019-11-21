@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
+using System.Text;
+using System.Text.Json;
 
 namespace Shipwreck.BlazorJqueryToast
 {
@@ -25,132 +26,113 @@ namespace Shipwreck.BlazorJqueryToast
 
         public override string ToString()
         {
-            using (var sw = new StringWriter())
-            using (var jtw = new JsonTextWriter(sw))
+            using (var ms = new MemoryStream())
+            using (var jw = new Utf8JsonWriter(ms))
             {
-                jtw.WriteStartObject();
+                jw.WriteStartObject();
                 {
                     if (Text != null)
                     {
-                        jtw.WritePropertyName("text");
-                        jtw.WriteValue(Text);
+                        jw.WriteString("text", Text);
                     }
                     if (Heading != null)
                     {
-                        jtw.WritePropertyName("heading");
-                        jtw.WriteValue(Heading);
+                        jw.WriteString("heading", Heading);
                     }
                     switch (Transition)
                     {
                         case ToastTransition.Fade:
-                            jtw.WritePropertyName("showHideTransition");
-                            jtw.WriteValue("fade");
+                            jw.WriteString("showHideTransition", "fade");
                             break;
 
                         case ToastTransition.Slide:
-                            jtw.WritePropertyName("showHideTransition");
-                            jtw.WriteValue("slide");
+                            jw.WriteString("showHideTransition", "slide");
                             break;
 
                         case ToastTransition.Plain:
-                            jtw.WritePropertyName("showHideTransition");
-                            jtw.WriteValue("plain");
+                            jw.WriteString("showHideTransition", "plain");
                             break;
                     }
 
                     if (AllowToastClose != null)
                     {
-                        jtw.WritePropertyName("allowToastClose");
-                        jtw.WriteValue(AllowToastClose.Value);
+                        jw.WriteBoolean("allowToastClose", AllowToastClose.Value);
                     }
 
                     if (HideAfter > TimeSpan.Zero)
                     {
-                        jtw.WritePropertyName("hideAfter");
-                        jtw.WriteValue(HideAfter.TotalMilliseconds);
+                        jw.WriteNumber("hideAfter", HideAfter.TotalMilliseconds);
                     }
                     else if (HideAfter < TimeSpan.Zero)
                     {
-                        jtw.WritePropertyName("hideAfter");
-                        jtw.WriteValue(false);
+                        jw.WriteBoolean("hideAfter", false);
                     }
 
                     if (StackLength > 0)
                     {
-                        jtw.WritePropertyName("stack");
-                        jtw.WriteValue(StackLength);
+                        jw.WriteNumber("stack", StackLength);
                     }
                     else if (StackLength < 0)
                     {
-                        jtw.WritePropertyName("stack");
-                        jtw.WriteValue(false);
+                        jw.WriteBoolean("stack", false);
                     }
 
                     var p = Position;
                     if (!p.IsEmpty)
                     {
-                        jtw.WritePropertyName("position");
-                        p.WriteTo(jtw);
+                        jw.WritePropertyName("position");
+                        p.WriteTo(jw);
                     }
 
                     switch (Icon)
                     {
                         case ToastIcon.Warning:
-                            jtw.WritePropertyName("icon");
-                            jtw.WriteValue("warning");
+                            jw.WriteString("icon", "warning");
                             break;
 
                         case ToastIcon.Success:
-                            jtw.WritePropertyName("icon");
-                            jtw.WriteValue("success");
+                            jw.WriteString("icon", "success");
                             break;
 
                         case ToastIcon.Error:
-                            jtw.WritePropertyName("icon");
-                            jtw.WriteValue("error");
+                            jw.WriteString("icon", "error");
                             break;
 
                         case ToastIcon.Information:
-                            jtw.WritePropertyName("icon");
-                            jtw.WriteValue("information");
+                            jw.WriteString("icon", "information");
                             break;
                     }
 
                     switch (TextAlign)
                     {
                         case TextAlignment.Left:
-                            jtw.WritePropertyName("textAlign");
-                            jtw.WriteValue("left");
+                            jw.WriteString("textAlign", "left");
                             break;
 
                         case TextAlignment.Center:
-                            jtw.WritePropertyName("textAlign");
-                            jtw.WriteValue("center");
+                            jw.WriteString("textAlign", "center");
                             break;
 
                         case TextAlignment.Right:
-                            jtw.WritePropertyName("textAlign");
-                            jtw.WriteValue("right");
+                            jw.WriteString("textAlign", "right");
                             break;
                     }
 
                     if (ShowLoader != null)
                     {
-                        jtw.WritePropertyName("loader");
-                        jtw.WriteValue(ShowLoader.Value);
+                        jw.WriteBoolean("loader", ShowLoader.Value);
                     }
 
                     if (LoaderBackground != null)
                     {
-                        jtw.WritePropertyName("loaderBg");
-                        jtw.WriteValue(LoaderBackground);
+                        jw.WriteString("loaderBg", LoaderBackground);
                     }
                 }
-                jtw.WriteEndObject();
+                jw.WriteEndObject();
 
-                jtw.Flush();
+                jw.Flush();
 
-                return sw.ToString();
+                return Encoding.UTF8.GetString(ms.ToArray());
             }
         }
     }

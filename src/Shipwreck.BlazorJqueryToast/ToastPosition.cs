@@ -1,5 +1,6 @@
-﻿using Newtonsoft.Json;
-using System.IO;
+﻿using System.IO;
+using System.Text;
+using System.Text.Json;
 
 namespace Shipwreck.BlazorJqueryToast
 {
@@ -47,22 +48,22 @@ namespace Shipwreck.BlazorJqueryToast
 
         public override string ToString()
         {
-            using (var sw = new StringWriter())
-            using (var jtw = new JsonTextWriter(sw))
+            using (var ms = new MemoryStream())
+            using (var jw = new Utf8JsonWriter(ms))
             {
-                WriteTo(jtw);
+                WriteTo(jw);
 
-                jtw.Flush();
+                jw.Flush();
 
-                return sw.ToString();
+                return Encoding.UTF8.GetString(ms.ToArray());
             }
         }
 
-        internal void WriteTo(JsonWriter writer)
+        internal void WriteTo(Utf8JsonWriter writer)
         {
             if (Value != null)
             {
-                writer.WriteValue(Value);
+                writer.WriteStringValue(Value);
             }
             else
             {
@@ -70,26 +71,22 @@ namespace Shipwreck.BlazorJqueryToast
 
                 if (Left != null)
                 {
-                    writer.WritePropertyName("left");
-                    writer.WriteValue(Left);
+                    writer.WriteString("left", Left);
                 }
 
                 if (Top != null)
                 {
-                    writer.WritePropertyName("top");
-                    writer.WriteValue(Top);
+                    writer.WriteString("top", Top);
                 }
 
                 if (Right != null)
                 {
-                    writer.WritePropertyName("right");
-                    writer.WriteValue(Right);
+                    writer.WriteString("right", Right);
                 }
 
                 if (Bottom != null)
                 {
-                    writer.WritePropertyName("bottom");
-                    writer.WriteValue(Bottom);
+                    writer.WriteString("bottom", Bottom);
                 }
 
                 writer.WriteEndObject();
