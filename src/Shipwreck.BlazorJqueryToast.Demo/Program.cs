@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.Blazor.Hosting;
+using System.Threading.Tasks;
 
 namespace Shipwreck.BlazorJqueryToast.Demo
 {
     public class Program
     {
-        public static void Main(string[] args) 
-            => CreateHostBuilder(args).Build().Run();
+        public static Task Main(string[] args)
+        {
+            var builder = WebAssemblyHostBuilder.CreateDefault(args);
+            builder.RootComponents.Add<App>("app");
 
-        public static IWebAssemblyHostBuilder CreateHostBuilder(string[] args) =>
-            BlazorWebAssemblyHost.CreateDefaultBuilder()
-                .UseBlazorStartup<Startup>();
+            return builder.Build().RunAsync();
+        }
     }
 }
