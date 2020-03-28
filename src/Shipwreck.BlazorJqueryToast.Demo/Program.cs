@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Blazor.Hosting;
+﻿using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
 namespace Shipwreck.BlazorJqueryToast.Demo
@@ -9,6 +10,7 @@ namespace Shipwreck.BlazorJqueryToast.Demo
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
+            builder.Services.AddBaseAddressHttpClient();
 
             return builder.Build().RunAsync();
         }
