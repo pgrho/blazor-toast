@@ -1,0 +1,10 @@
+{
+  "version": "1.0.0",
+  "name": "shipwreck.blazor-jquery-toast.demo",
+  "private": true,
+  "devDependencies": {
+    "del": "5.1.0",
+    "gulp": "^4.0.2",
+    "gulp-concat": "2.6.1"
+  }
+}
